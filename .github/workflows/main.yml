@@ -21,10 +21,6 @@ jobs:
           cd ..
           rm -rf tmp_choma
 
-      - name: Fix include path case sensitivity
-        run: |
-          grep -rl '#include "Fat.h"' ./Exploits/fastPathSign/src | xargs sed -i '' 's|#include "Fat.h"|#include "FAT.h"|g'
-
       - name: Install dependencies
         run: |
           brew install ldid pkg-config
