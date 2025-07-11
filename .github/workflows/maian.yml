@@ -36,13 +36,13 @@ jobs:
           make
 
       - name: Upload fastPathSign binary
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: fastPathSign-binary
           path: ./Exploits/fastPathSign/fastPathSign
 
       - name: Upload full obj folders
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: theos-obj-folders
           path: |
