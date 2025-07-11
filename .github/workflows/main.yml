@@ -2,11 +2,6 @@ name: Build fastPathSign
 
 on:
   workflow_dispatch:
-    inputs:
-      branch:
-        description: 'Branch to build TrollStore from'
-        required: true
-        default: 'main'
 
 jobs:
   build:
@@ -15,8 +10,6 @@ jobs:
     steps:
       - name: Checkout TrollStore repository
         uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.inputs.branch }}
 
       - name: Fetch ChOma src files only
         run: |
@@ -27,6 +20,10 @@ jobs:
           cp -R src/* ../Exploits/fastPathSign/src/
           cd ..
           rm -rf tmp_choma
+
+      - name: Fix include path case sensitivity
+        run: |
+          grep -rl '#include "Fat.h"' ./Exploits/fastPathSign/src | xargs sed -i '' 's|#include "Fat.h"|#include "FAT.h"|g'
 
       - name: Install dependencies
         run: |
