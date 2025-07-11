@@ -1,0 +1,53 @@
+name: Build TrollStore with fastPathSign
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Theos
+        run: |
+          git clone --depth=1 https://github.com/theos/theos.git $HOME/theos
+          echo "export THEOS=$HOME/theos" >> $GITHUB_ENV
+          brew install ldid
+
+      - name: Build fastPathSign
+        working-directory: ./Exploits/fastPathSign
+        env:
+          THEOS: ${{ env.THEOS }}
+        run: |
+          make clean
+          make
+
+      - name: Build full TrollStore
+        env:
+          THEOS: ${{ env.THEOS }}
+        run: |
+          make clean
+          make
+
+      - name: Upload fastPathSign binary
+        uses: actions/upload-artifact@v3
+        with:
+          name: fastPathSign-binary
+          path: ./Exploits/fastPathSign/fastPathSign
+
+      - name: Upload full obj folders
+        uses: actions/upload-artifact@v3
+        with:
+          name: theos-obj-folders
+          path: |
+            ./RootHelper/.theos/obj
+            ./TrollStore/.theos/obj
+            ./TrollHelper/.theos/obj
+            ./TrollStoreLite/.theos/obj
+            
