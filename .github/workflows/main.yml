@@ -1,16 +1,10 @@
 name: Build fastPathSign
 
 on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
   workflow_dispatch:
     inputs:
       branch:
-        description: 'Branch to build'
+        description: 'Branch to build TrollStore from'
         required: true
         default: 'main'
 
@@ -19,19 +13,34 @@ jobs:
     runs-on: macos-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout TrollStore repository
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.inputs.branch || github.ref_name }}
+          ref: ${{ github.event.inputs.branch }}
+
+      - name: Fetch ChOma src files only
+        run: |
+          mkdir -p ./Exploits/fastPathSign/src
+          git clone --depth=1 --filter=blob:none --sparse https://github.com/opa334/ChOma.git tmp_choma
+          cd tmp_choma
+          git sparse-checkout set src
+          cp -R src/* ../Exploits/fastPathSign/src/
+          cd ..
+          rm -rf tmp_choma
+
+      - name: Install dependencies
+        run: |
+          brew install ldid pkg-config
 
       - name: Build fastPathSign
         working-directory: ./Exploits/fastPathSign
         run: |
           make clean
           make
+          ls -la
 
       - name: Upload fastPathSign binary
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
           name: fastPathSign-binary
           path: ./Exploits/fastPathSign/fastPathSign
