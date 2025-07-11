@@ -1,0 +1,38 @@
+name: Build fastPathSign
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch to build'
+        required: true
+        default: 'main'
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.branch || github.ref_name }}
+
+      - name: Build fastPathSign
+        working-directory: ./Exploits/fastPathSign
+        run: |
+          make clean
+          make
+
+      - name: Upload fastPathSign binary
+        uses: actions/upload-artifact@v3
+        with:
+          name: fastPathSign-binary
+          path: ./Exploits/fastPathSign/fastPathSign
+          
